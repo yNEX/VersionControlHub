@@ -36,8 +36,8 @@ jobs:
           unzip aria2-win-64bit.zip -d ./aria2-release
 
       - name: Upload EXE to GitHub
-        env:
-          GH_PAT: ${{ secrets.GETLATESTARIA2EXE }}
+        with:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
           echo "Uploading exe to GitHub..."
           EXE_PATH=$(find ./aria2-release -name "aria2c.exe" -print -quit)
