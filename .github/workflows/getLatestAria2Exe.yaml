@@ -35,6 +35,10 @@ jobs:
           wget -O aria2-win-64bit.zip "$DOWNLOAD_URL"
           unzip aria2-win-64bit.zip -d ./aria2-release
 
+      - name: List files unzipped
+        run: |
+          ls -l ./aria2-release 
+           
       - name: Compare MD5 hashes and update if necessary
         run: |
           LOCAL_HASH=$(md5sum ./aria2c.exe | cut -d ' ' -f1)
