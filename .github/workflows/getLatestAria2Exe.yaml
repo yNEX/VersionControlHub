@@ -50,10 +50,10 @@ jobs:
         run: |
           LOCAL_HASH=$(md5sum ./aria2c.exe | cut -d ' ' -f1)
           DOWNLOADED_HASH=$(md5sum "$ARIA2C_PATH" | cut -d ' ' -f1)
-        
+
           if [[ "$DOWNLOADED_HASH" != "$LOCAL_HASH" ]]; then
             echo "Newer version found. Uploading exe to GitHub..."
-            mv "$ARIA2C_PATH" ./aria2c.exe  # Überschreibe die lokale Datei
+            mv "$ARIA2C_PATH" ./aria2c.exe
             git config --global user.email "ynexgaming@gmail.com"
             git config --global user.name "yNEX"
             git add aria2c.exe
