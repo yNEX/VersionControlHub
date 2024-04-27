@@ -47,4 +47,4 @@ jobs:
           git add aria2c.exe  # Hinzufügen der Datei
           git commit -m "Update aria2 executable to latest version"
           git push origin HEAD:main  # Pushen der Änderungen
-          
+      
