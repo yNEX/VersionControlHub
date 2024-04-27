@@ -26,9 +26,13 @@ jobs:
       - name: Download and unzip latest Aria2 release
         run: |
           echo "Downloading latest Aria2 win-64bit zip..."
-          curl -s https://api.github.com/repos/aria2/aria2/releases/latest |
-          jq -r '.assets[] | select(.name | contains("win-64bit.zip")) | .browser_download_url' |
-          xargs wget -O aria2-win-64bit.zip
+          DOWNLOAD_URL=$(curl -s https://api.github.com/repos/aria2/aria2/releases/latest |
+          jq -r '.assets[] | select(.name | test("win-64bit.*\\.zip")) | .browser_download_url')
+          if [[ -z "$DOWNLOAD_URL" ]]; then
+            echo "Download URL not found"
+            exit 1
+          fi
+          wget -O aria2-win-64bit.zip "$DOWNLOAD_URL"
           unzip aria2-win-64bit.zip -d ./aria2-release
 
       - name: Upload EXE to GitHub
