@@ -1,0 +1,43 @@
+name: Update Aria2 EXE
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Runs daily at midnight
+
+jobs:
+  update-exe:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq unzip
+
+      - name: Download and unzip latest Aria2 release
+        run: |
+          echo "Downloading latest Aria2 win-64bit zip..."
+          curl -s https://api.github.com/repos/aria2/aria2/releases/latest |
+          jq -r '.assets[] | select(.name | contains("win-64bit.zip")) | .browser_download_url' |
+          xargs wget -O aria2-win-64bit.zip
+          unzip aria2-win-64bit.zip -d ./aria2-release
+
+      - name: Upload EXE to GitHub
+        env:
+          GH_PAT: ${{ secrets.GETLATESTARIA2EXE }}
+        run: |
+          echo "Uploading exe to GitHub..."
+          EXE_PATH=$(find ./aria2-release -name "aria2c.exe" -print -quit)
+          git config --global user.email "ynexgaming@gmail.com"
+          git config --global user.name "yNEX"
+          git add "$EXE_PATH"
+          git commit -m "Update aria2 executable to latest version"
+          git push
