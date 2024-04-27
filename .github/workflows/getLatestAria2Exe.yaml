@@ -35,18 +35,25 @@ jobs:
           wget -O aria2-win-64bit.zip "$DOWNLOAD_URL"
           unzip aria2-win-64bit.zip -d ./aria2-release
 
-      - name: List files unzipped
+      - name: Find and store the path of the downloaded aria2c.exe
         run: |
-          ls -l ./aria2-release 
-           
+          echo "Searching for aria2c.exe recursively..."
+          ARIA2C_PATH=$(find ./aria2-release -name 'aria2c.exe' -print -quit)
+          if [[ -z "$ARIA2C_PATH" ]]; then
+            echo "aria2c.exe not found"
+            exit 1
+          fi
+          echo "Found aria2c.exe at $ARIA2C_PATH"
+          echo "ARIA2C_PATH=$ARIA2C_PATH" >> $GITHUB_ENV
+
       - name: Compare MD5 hashes and update if necessary
         run: |
           LOCAL_HASH=$(md5sum ./aria2c.exe | cut -d ' ' -f1)
-          DOWNLOADED_HASH=$(md5sum ./aria2-release/aria2c.exe | cut -d ' ' -f1)
-
+          DOWNLOADED_HASH=$(md5sum ${{ env.ARIA2C_PATH }} | cut -d ' ' -f1)
+      
           if [[ "$DOWNLOADED_HASH" != "$LOCAL_HASH" ]]; then
             echo "Newer version found. Uploading exe to GitHub..."
-            mv ./aria2-release/aria2c.exe ./aria2c.exe  # Überschreibe die lokale Datei
+            mv ${{ env.ARIA2C_PATH }} ./aria2c.exe  # Überschreibe die lokale Datei
             git config --global user.email "ynexgaming@gmail.com"
             git config --global user.name "yNEX"
             git add aria2c.exe
@@ -54,3 +61,4 @@ jobs:
             git push origin HEAD:main
           else
             echo "No newer version found. Exiting without updating."
+      
