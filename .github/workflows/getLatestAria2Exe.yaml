@@ -35,6 +35,11 @@ jobs:
           wget -O aria2-win-64bit.zip "$DOWNLOAD_URL"
           unzip aria2-win-64bit.zip -d ./aria2-release
 
+      - name: Debugging
+        run: |
+          ls -l
+          git status
+
       - name: Upload EXE to GitHub
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
