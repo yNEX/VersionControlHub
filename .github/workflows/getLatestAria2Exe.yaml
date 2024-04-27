@@ -49,16 +49,15 @@ jobs:
       - name: Compare MD5 hashes and update if necessary
         run: |
           LOCAL_HASH=$(md5sum ./aria2c.exe | cut -d ' ' -f1)
-          DOWNLOADED_HASH=$(md5sum ${{ env.ARIA2C_PATH }} | cut -d ' ' -f1)
-      
+          DOWNLOADED_HASH=$(md5sum "$ARIA2C_PATH" | cut -d ' ' -f1)
+        
           if [[ "$DOWNLOADED_HASH" != "$LOCAL_HASH" ]]; then
             echo "Newer version found. Uploading exe to GitHub..."
-            mv ${{ env.ARIA2C_PATH }} ./aria2c.exe  # Überschreibe die lokale Datei
+            mv "$ARIA2C_PATH" ./aria2c.exe  # Überschreibe die lokale Datei
             git config --global user.email "ynexgaming@gmail.com"
             git config --global user.name "yNEX"
             git add aria2c.exe
             git commit -m "Update aria2 executable to latest version"
-            git push origin HEAD:main
+            git push
           else
             echo "No newer version found. Exiting without updating."
-      
