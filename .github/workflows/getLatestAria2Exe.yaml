@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -35,20 +35,23 @@ jobs:
           wget -O aria2-win-64bit.zip "$DOWNLOAD_URL"
           unzip aria2-win-64bit.zip -d ./aria2-release
 
-      - name: Debugging
+      - name: Copy local aria2c.exe
         run: |
-          ls -l
-          git status
+          cp aria2c.exe ./aria2-release/aria2c-local.exe
 
-      - name: Upload EXE to GitHub
-        env:
-          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      - name: Compare versions and update if necessary
         run: |
-          echo "Uploading exe to GitHub..."
-          EXE_PATH=$(find ./aria2-release -name "aria2c.exe" -print -quit)
-          mv "$EXE_PATH" ./aria2c.exe  # Verschiebe die Datei ins Root-Verzeichnis
-          git config --global user.email "ynexgaming@gmail.com"
-          git config --global user.name "yNEX"
-          git add aria2c.exe  # Hinzufügen der Datei
-          git commit -m "Update aria2 executable to latest version"
-          git push origin HEAD:main  # Pushen der Änderungen
+          LOCAL_VERSION=$(./aria2-release/aria2c-local.exe --version | grep -oP 'aria2 (\d+\.?)+')
+          DOWNLOADED_VERSION=$(unzip -p ./aria2-release/aria2c.exe --version | grep -oP 'aria2 (\d+\.?)+')
+
+          if [[ "$DOWNLOADED_VERSION" != "$LOCAL_VERSION" ]]; then
+            echo "Newer version found. Uploading exe to GitHub..."
+            mv ./aria2-release/aria2c.exe ./aria2c.exe  # Überschreibe die lokale Datei
+            git config --global user.email "ynexgaming@gmail.com"
+            git config --global user.name "yNEX"
+            git add aria2c.exe
+            git commit -m "Update aria2 executable to latest version"
+            git push origin HEAD:main
+          else
+            echo "No newer version found. Exiting without updating."
+          fi
