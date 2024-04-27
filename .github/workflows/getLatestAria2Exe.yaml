@@ -41,8 +41,10 @@ jobs:
         run: |
           echo "Uploading exe to GitHub..."
           EXE_PATH=$(find ./aria2-release -name "aria2c.exe" -print -quit)
+          mv "$EXE_PATH" ./aria2c.exe  # Verschiebe die Datei ins Root-Verzeichnis
           git config --global user.email "ynexgaming@gmail.com"
           git config --global user.name "yNEX"
-          git add "$EXE_PATH"
+          git add aria2c.exe  # Hinzufügen der Datei
           git commit -m "Update aria2 executable to latest version"
-          git push
+          git push origin HEAD:main  # Pushen der Änderungen
+
