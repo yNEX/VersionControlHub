@@ -3,7 +3,7 @@ name: Update Aria2 EXE
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * *" # Runs daily at midnight
+    - cron: "0 0 * * *" # Läuft täglich um Mitternacht
 
 jobs:
   update-exe:
@@ -35,16 +35,12 @@ jobs:
           wget -O aria2-win-64bit.zip "$DOWNLOAD_URL"
           unzip aria2-win-64bit.zip -d ./aria2-release
 
-      - name: Copy local aria2c.exe
+      - name: Compare MD5 hashes and update if necessary
         run: |
-          cp aria2c.exe ./aria2-release/aria2c-local.exe
+          LOCAL_HASH=$(md5sum ./aria2c.exe | cut -d ' ' -f1)
+          DOWNLOADED_HASH=$(md5sum ./aria2-release/aria2c.exe | cut -d ' ' -f1)
 
-      - name: Compare versions and update if necessary
-        run: |
-          LOCAL_VERSION=$(./aria2-release/aria2c-local.exe --version | grep -oP 'aria2 (\d+\.?)+')
-          DOWNLOADED_VERSION=$(unzip -p ./aria2-release/aria2c.exe --version | grep -oP 'aria2 (\d+\.?)+')
-
-          if [[ "$DOWNLOADED_VERSION" != "$LOCAL_VERSION" ]]; then
+          if [[ "$DOWNLOADED_HASH" != "$LOCAL_HASH" ]]; then
             echo "Newer version found. Uploading exe to GitHub..."
             mv ./aria2-release/aria2c.exe ./aria2c.exe  # Überschreibe die lokale Datei
             git config --global user.email "ynexgaming@gmail.com"
@@ -54,4 +50,3 @@ jobs:
             git push origin HEAD:main
           else
             echo "No newer version found. Exiting without updating."
-          fi
