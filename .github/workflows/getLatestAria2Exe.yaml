@@ -36,8 +36,6 @@ jobs:
           unzip aria2-win-64bit.zip -d ./aria2-release
 
       - name: Upload EXE to GitHub
-        with:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
           echo "Uploading exe to GitHub..."
           EXE_PATH=$(find ./aria2-release -name "aria2c.exe" -print -quit)
@@ -47,4 +45,6 @@ jobs:
           git add aria2c.exe  # Hinzufügen der Datei
           git commit -m "Update aria2 executable to latest version"
           git push origin HEAD:main  # Pushen der Änderungen
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
